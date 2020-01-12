@@ -1,8 +1,9 @@
 
 import numpy as np
 from scipy.spatial import distance
-
-
+import pandas as pd
+import matplotlib.pyplot as plt
+import csv
 
 
 def k_means_cluster(data, numClusters):
@@ -27,6 +28,15 @@ def k_means_cluster(data, numClusters):
 	minY, maxY = get_min_max(dataY)
 
 	clusterCentres = initiate_cluster_centres(numClusters, minX, maxX, minY, maxY)
+	
+	"""print(clusterCentres)
+	plt.scatter(dataX, dataY)
+	for clusterCentre in clusterCentres:
+		plt.scatter(clusterCentre[0],clusterCentre[1])
+	plt.show()"""
+	#plt.
+
+	update_cluster_centres(clusterCentres, data)
 
 
 
@@ -47,7 +57,8 @@ def update_cluster_centres(clusterCentres, data):
 			distances.append(dist)
 
 		closestCentreIndex = np.argmin(distances)
-		clusterData.append([datapoint, closestCentreIndex])
+		clusterData.append([dataPoint, closestCentreIndex])
+	print(clusterData)
 
 	
 
@@ -80,4 +91,18 @@ def get_min_max(data):
 
 
 
-def main()
+def main():
+
+	data = np.genfromtxt('iris.csv', delimiter = ',')
+	#petal length and petal width
+	xyData = data[:,2:4]
+	print(xyData)
+
+	k_means_cluster(xyData, 3)
+
+
+
+
+
+if __name__ == '__main__':
+	main()
