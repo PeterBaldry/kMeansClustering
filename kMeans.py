@@ -29,22 +29,28 @@ def k_means_cluster(data, numClusters):
 
 	clusterCentres = initiate_cluster_centres(numClusters, minX, maxX, minY, maxY)
 	
-	"""print(clusterCentres)
-	plt.scatter(dataX, dataY)
+	plot_clusters(clusterCentres, dataX, dataY)
+
+	for i in range(10):
+		cluster_centres = update_cluster_centres(clusterCentres, data)
+		plot_clusters(clusterCentres, dataX, dataY)
+
+
+def plot_clusters(clusterCentres, dataX, dataY):
+	"""
+	"""
 	for clusterCentre in clusterCentres:
-		plt.scatter(clusterCentre[0],clusterCentre[1])
-	plt.show()"""
-	#plt.
-
-	update_cluster_centres(clusterCentres, data)
-
-
+		plt.scatter(dataX, dataY, c='black')
+		plt.scatter(clusterCentre[0],clusterCentre[1], c = 'red')
+	plt.show()
 
 
 def update_cluster_centres(clusterCentres, data):
 	"""
 	"""
 
+	# list of lists. the inner lists will contain the datapoints
+	# that belong to each cluster centre
 	clusterData = []
 
 	for dataPoint in data:
@@ -57,12 +63,39 @@ def update_cluster_centres(clusterCentres, data):
 			distances.append(dist)
 
 		closestCentreIndex = np.argmin(distances)
-		clusterData.append([dataPoint, closestCentreIndex])
-	print(clusterData)
+		clusterData.append([closestCentreIndex, dataPoint])
+
+	clusterData = np.array(clusterData)
+	new_centres = find_averages(clusterData, clusterCentres)
+
+	return new_centres
+
+
+def find_averages(clusterData, clusterCentres):
+	"""
+	"""
+
+	clusterSumsX = [0] * len(clusterCentres)
+	clusterSumsY = [0] * len(clusterCentres)
+	counts = [0] * len(clusterCentres)
+
+	for dataPoint in clusterData:
+		clusterSumsX[dataPoint[0]] += dataPoint[1][0]
+		clusterSumsY[dataPoint[0]] += dataPoint[1][1]
+		counts[dataPoint[0]] += 1
+
+	for index in range(len(clusterCentres)):
+		if (counts[index] == 0):
+			xAv = 0
+			yAv = 0
+		else:
+			xAv = clusterSumsX[index]/counts[index]
+			yAv = clusterSumsY[index]/counts[index]
+		clusterCentres[index] = [xAv, yAv]
+
+	return clusterCentres
 
 	
-
-
 
 def initiate_cluster_centres(numClusters, minX, maxX, minY, maxY):
 	"""
@@ -94,9 +127,10 @@ def get_min_max(data):
 def main():
 
 	data = np.genfromtxt('iris.csv', delimiter = ',')
+
 	#petal length and petal width
 	xyData = data[:,2:4]
-	print(xyData)
+	
 
 	k_means_cluster(xyData, 3)
 
