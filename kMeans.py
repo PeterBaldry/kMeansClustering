@@ -1,3 +1,8 @@
+"""
+Author: Peter Baldry
+
+Two dimensional k-means clustering
+"""
 
 import numpy as np
 from scipy.spatial import distance
@@ -6,7 +11,7 @@ import matplotlib.pyplot as plt
 import csv
 
 
-def k_means_cluster(data, numClusters):
+def k_means_cluster(data, numClusters, iterations):
 	"""
 
 	
@@ -29,19 +34,21 @@ def k_means_cluster(data, numClusters):
 
 	clusterCentres = initiate_cluster_centres(numClusters, minX, maxX, minY, maxY)
 	
-	plot_clusters(clusterCentres, dataX, dataY)
+	plot_clusters(clusterCentres, dataX, dataY, 0)
 
-	for i in range(10):
+	for i in range(iterations):
 		cluster_centres = update_cluster_centres(clusterCentres, data)
-		plot_clusters(clusterCentres, dataX, dataY)
+		plot_clusters(clusterCentres, dataX, dataY, i+1)
 
 
-def plot_clusters(clusterCentres, dataX, dataY):
+def plot_clusters(clusterCentres, dataX, dataY, iteration):
 	"""
 	"""
 	for clusterCentre in clusterCentres:
-		plt.scatter(dataX, dataY, c='black')
-		plt.scatter(clusterCentre[0],clusterCentre[1], c = 'red')
+		plt.scatter(dataX, dataY, c='black', s = 10)
+		plt.scatter(clusterCentre[0],clusterCentre[1], c = 'red', marker = '^', s= 100)
+
+	plt.suptitle('Cluster centres after {} iterations'.format(str(iteration)))
 	plt.show()
 
 
@@ -125,14 +132,15 @@ def get_min_max(data):
 
 
 def main():
-
+	"""
+	"""
 	data = np.genfromtxt('iris.csv', delimiter = ',')
 
 	#petal length and petal width
 	xyData = data[:,2:4]
 	
 
-	k_means_cluster(xyData, 3)
+	k_means_cluster(xyData, 3, 10)
 
 
 
