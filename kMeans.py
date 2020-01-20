@@ -11,201 +11,182 @@ import matplotlib.pyplot as plt
 import csv
 from const import *
 
+class KMeansCluster:
 
-def k_means_cluster(data, numClusters, iterations):
-	"""
+	def __init__(self, data, numClusters, iterations):
+		self.data = data
+		self.numClusters = numClusters
+		self.iterations = iterations
 
-	Args:
-		data: the data to be clustered into numClusters clusters
-		numClusters: the number of clusters
-		iterations: the number of iterations the algorithm runs for
 
-	Returns:
+	def k_means(self):
+		"""
 
-	"""
+		Args:
+			data: the data to be clustered into numClusters clusters. in the form [[x1,y1], [x2,y2], ... , [xn,yn]]
+			numClusters: the number of clusters
+			iterations: the number of iterations the algorithm runs for
 
-	dataX = data[:,0]
-	dataY = data[:,1]
+		Returns:
 
-	minX, maxX = get_min_max(dataX) 
-	minY, maxY = get_min_max(dataY)
-	
-	clusterCentres = initiate_cluster_centres(numClusters, minX, maxX, minY, maxY)
-	
-	plot_clusters(clusterCentres, data, 0)
+		"""
 
-	for i in range(iterations):
-		clusterCentres = update_cluster_centres(clusterCentres, data)
-		plot_clusters(clusterCentres, data, i+1)
+		dataX = self.data[:,0]
+		dataY = self.data[:,1]
 
-	return 1
+		minX, maxX = self.get_min_max(dataX)
+		minY, maxY = self.get_min_max(dataY)
 
+		clusterCentres = self.initiate_cluster_centres(minX, maxX, minY, maxY)
 
-def plot_clusters(clusterCentres, data, iteration):
-	"""
+		self.plot_clusters(clusterCentres, 0)
 
-	Args:
-		clusterCentres:
-		data:
-		iteration:
+		for i in range(self.iterations):
+			clusterCentres = self.update_cluster_centres(clusterCentres)
+			self.plot_clusters(clusterCentres, i + 1)
 
-	Returns:
+		return 1
 
-	"""
-	
-	for index, clusterCentre in enumerate(clusterCentres):
 
-		for point in data:
-			closestCentreIndex = get_closest_cluster(point, clusterCentres)
-			plt.scatter(point[0], point[1], c=COLOURS[closestCentreIndex], s = 10)
-		plt.scatter(clusterCentre[0],clusterCentre[1], c = COLOURS[index], marker = '^', s= 100)
+	def plot_clusters(self, clusterCentres, iteration):
+		"""
 
-	plt.suptitle('Cluster centres after {} iterations'.format(str(iteration)))
-	plt.show()
+		Args:
+			clusterCentres:
+			data:
+			iteration:
 
+		Returns:
 
-def update_cluster_centres(clusterCentres, data):
-	"""
+		"""
 
-	Args:
-		clusterCentres:
-		data:
+		for index, clusterCentre in enumerate(clusterCentres):
 
-	Returns:
+			for point in self.data:
+				closestCentreIndex = self.get_closest_cluster(point, clusterCentres)
+				plt.scatter(point[0], point[1], c=COLOURS[closestCentreIndex], s=10)
+			plt.scatter(clusterCentre[0], clusterCentre[1], c=COLOURS[index], marker='^', s=100)
 
-	"""
+		plt.suptitle('Cluster centres after {} iterations'.format(str(iteration)))
+		plt.show()
 
-	# list of lists. the inner lists will contain the datapoints
-	# that belong to each cluster centre
-	clusterData = []
 
-	for dataPoint in data:
+	def update_cluster_centres(self, clusterCentres):
+		"""
 
-		closestCentreIndex = get_closest_cluster(dataPoint, clusterCentres)
-		clusterData.append([closestCentreIndex, dataPoint])
+		Args:
+			clusterCentres:
+			data:
 
+		Returns:
 
-	clusterData = np.array(clusterData)
-	new_centres = find_averages(clusterData, clusterCentres)
+		"""
 
-	return new_centres
+		# list of lists. the inner lists will contain the datapoints
+		# that belong to each cluster centre
+		clusterData = []
 
-def get_closest_cluster(dataPoint, clusterCentres):
-	"""
+		for dataPoint in self.data:
+			closestCentreIndex = self.get_closest_cluster(dataPoint, clusterCentres)
+			clusterData.append([closestCentreIndex, dataPoint])
 
-	Args:
-		dataPoint:
-		clusterCentres:
+		clusterData = np.array(clusterData)
+		new_centres = self.find_averages(clusterData, clusterCentres)
 
-	Returns:
+		return new_centres
 
-	"""
-	distances = []
 
-	for clusterCentre in clusterCentres:
+	def get_closest_cluster(self, dataPoint, clusterCentres):
+		"""
 
-		dist = distance.euclidean(dataPoint, clusterCentre)
-		distances.append(dist)
+		Args:
+			dataPoint: a data point in the form [x,y]
+			clusterCentres: the cluster centre coordinates
 
-	closestCentreIndex = np.argmin(distances)
+		Returns: the index of the closest cluster centre
 
-	return closestCentreIndex
-		
+		"""
+		distances = []
 
-def find_averages(clusterData, clusterCentres):
-	"""
+		for clusterCentre in clusterCentres:
+			dist = distance.euclidean(dataPoint, clusterCentre)
+			distances.append(dist)
 
-	Args:
-		clusterData:
-		clusterCentres:
+		closestCentreIndex = np.argmin(distances)
 
-	Returns:
+		return closestCentreIndex
 
-	"""
 
-	clusterSumsX = [0] * len(clusterCentres)
-	clusterSumsY = [0] * len(clusterCentres)
-	counts = [0] * len(clusterCentres)
+	def find_averages(self, clusterData, clusterCentres):
+		"""
 
-	for dataPoint in clusterData:
-		clusterSumsX[dataPoint[0]] += dataPoint[1][0]
-		clusterSumsY[dataPoint[0]] += dataPoint[1][1]
-		counts[dataPoint[0]] += 1
+		Args:
+			clusterData:
+			clusterCentres:
 
-	for index in range(len(clusterCentres)):
-		if (counts[index] == 0):
-			xAv = 0
-			yAv = 0
-		else:
-			xAv = clusterSumsX[index]/counts[index]
-			yAv = clusterSumsY[index]/counts[index]
-		clusterCentres[index] = [xAv, yAv]
+		Returns:
 
-	return clusterCentres
+		"""
 
-	
+		clusterSumsX = [0] * len(clusterCentres)
+		clusterSumsY = [0] * len(clusterCentres)
+		counts = [0] * len(clusterCentres)
 
-def initiate_cluster_centres(numClusters, minX, maxX, minY, maxY):
-	"""
+		for dataPoint in clusterData:
+			clusterSumsX[dataPoint[0]] += dataPoint[1][0]
+			clusterSumsY[dataPoint[0]] += dataPoint[1][1]
+			counts[dataPoint[0]] += 1
 
-	Args:
-		numClusters:
-		minX:
-		maxX:
-		minY:
-		maxY:
+		for index in range(len(clusterCentres)):
+			if (counts[index] == 0):
+				xAv = 0
+				yAv = 0
+			else:
+				xAv = clusterSumsX[index] / counts[index]
+				yAv = clusterSumsY[index] / counts[index]
+			clusterCentres[index] = [xAv, yAv]
 
-	Returns:
+		return clusterCentres
 
-	"""
 
-	clusterCentres = []
+	def initiate_cluster_centres(self, minX, maxX, minY, maxY):
+		"""
 
-	for clusterNum in range(numClusters):
+		Args:
+			numClusters:
+			minX:
+			maxX:
+			minY:
+			maxY:
 
-		x = np.random.uniform(minX, maxX)
-		y = np.random.uniform(minY, maxY)
-		clusterCentres.append([x,y])
+		Returns:
 
-	return clusterCentres
+		"""
 
+		clusterCentres = []
 
-def get_min_max(data):
-	"""
+		for clusterNum in range(self.numClusters):
+			x = np.random.uniform(minX, maxX)
+			y = np.random.uniform(minY, maxY)
+			clusterCentres.append([x, y])
 
-	Args:
-		data:
+		return clusterCentres
 
-	Returns:
 
-	"""
+	def get_min_max(self, data):
+		"""
 
+		Args:
+			data:
 
-	minDat = min(data)
-	maxDat = max(data)
+		Returns:
 
-	return minDat, maxDat
+		"""
 
+		minDat = min(data)
+		maxDat = max(data)
 
+		return minDat, maxDat
 
-def main():
-	"""
 
-	Returns:
 
-	"""
-	data = np.genfromtxt('iris.csv', delimiter = ',')
-
-	#petal length and petal width
-	xyData = data[1:,2:4]
-	#print(xyData)
-	
-
-	k_means_cluster(xyData, 3, 10)
-
-
-
-
-
-if __name__ == '__main__':
-	main()
