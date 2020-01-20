@@ -16,9 +16,9 @@ def k_means_cluster(data, numClusters, iterations):
 	"""
 
 	Args:
-		data:
-		numClusters:
-		iterations:
+		data: the data to be clustered into numClusters clusters
+		numClusters: the number of clusters
+		iterations: the number of iterations the algorithm runs for
 
 	Returns:
 
@@ -35,7 +35,7 @@ def k_means_cluster(data, numClusters, iterations):
 	plot_clusters(clusterCentres, data, 0)
 
 	for i in range(iterations):
-		cluster_centres = update_cluster_centres(clusterCentres, data)
+		clusterCentres = update_cluster_centres(clusterCentres, data)
 		plot_clusters(clusterCentres, data, i+1)
 
 	return 1
