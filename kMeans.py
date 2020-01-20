@@ -9,6 +9,7 @@ from scipy.spatial import distance
 import pandas as pd
 import matplotlib.pyplot as plt
 import csv
+from const import *
 
 
 def k_means_cluster(data, numClusters, iterations):
@@ -31,22 +32,26 @@ def k_means_cluster(data, numClusters, iterations):
 
 	minX, maxX = get_min_max(dataX) 
 	minY, maxY = get_min_max(dataY)
-
+	
 	clusterCentres = initiate_cluster_centres(numClusters, minX, maxX, minY, maxY)
 	
-	plot_clusters(clusterCentres, dataX, dataY, 0)
+	plot_clusters(clusterCentres, data, 0)
 
 	for i in range(iterations):
 		cluster_centres = update_cluster_centres(clusterCentres, data)
-		plot_clusters(clusterCentres, dataX, dataY, i+1)
+		plot_clusters(clusterCentres, data, i+1)
 
 
-def plot_clusters(clusterCentres, dataX, dataY, iteration):
+def plot_clusters(clusterCentres, data, iteration):
 	"""
 	"""
-	for clusterCentre in clusterCentres:
-		plt.scatter(dataX, dataY, c='black', s = 10)
-		plt.scatter(clusterCentre[0],clusterCentre[1], c = 'red', marker = '^', s= 100)
+	
+	for index, clusterCentre in enumerate(clusterCentres):
+
+		for point in data:
+			closestCentreIndex = get_closest_cluster(point, clusterCentres)
+			plt.scatter(point[0], point[1], c=COLOURS[closestCentreIndex], s = 10)
+		plt.scatter(clusterCentre[0],clusterCentre[1], c = COLOURS[index], marker = '^', s= 100)
 
 	plt.suptitle('Cluster centres after {} iterations'.format(str(iteration)))
 	plt.show()
@@ -62,6 +67,17 @@ def update_cluster_centres(clusterCentres, data):
 
 	for dataPoint in data:
 
+		closestCentreIndex = get_closest_cluster(dataPoint, clusterCentres)
+		clusterData.append([closestCentreIndex, dataPoint])
+
+
+	clusterData = np.array(clusterData)
+	new_centres = find_averages(clusterData, clusterCentres)
+
+	return new_centres
+
+def get_closest_cluster(dataPoint, clusterCentres):
+
 		distances = []
 
 		for clusterCentre in clusterCentres:
@@ -70,13 +86,9 @@ def update_cluster_centres(clusterCentres, data):
 			distances.append(dist)
 
 		closestCentreIndex = np.argmin(distances)
-		clusterData.append([closestCentreIndex, dataPoint])
 
-	clusterData = np.array(clusterData)
-	new_centres = find_averages(clusterData, clusterCentres)
-
-	return new_centres
-
+		return closestCentreIndex
+		
 
 def find_averages(clusterData, clusterCentres):
 	"""
@@ -137,7 +149,8 @@ def main():
 	data = np.genfromtxt('iris.csv', delimiter = ',')
 
 	#petal length and petal width
-	xyData = data[:,2:4]
+	xyData = data[1:,2:4]
+	print(xyData)
 	
 
 	k_means_cluster(xyData, 3, 10)
