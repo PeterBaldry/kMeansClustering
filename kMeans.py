@@ -15,17 +15,14 @@ from const import *
 def k_means_cluster(data, numClusters, iterations):
 	"""
 
-	
-
-	Paramaters:
-	- data: in the form [(x1,y1), (x2, y2), ..., (xn,yn)]
-	- numClusters: integer - the number of clusters 
+	Args:
+		data:
+		numClusters:
+		iterations:
 
 	Returns:
-	- clusterCentres - the coordinates of the cluster centres
-	- dataClustered - each data point's corresponding cluster
-	"""
 
+	"""
 
 	dataX = data[:,0]
 	dataY = data[:,1]
@@ -41,9 +38,19 @@ def k_means_cluster(data, numClusters, iterations):
 		cluster_centres = update_cluster_centres(clusterCentres, data)
 		plot_clusters(clusterCentres, data, i+1)
 
+	return 1
+
 
 def plot_clusters(clusterCentres, data, iteration):
 	"""
+
+	Args:
+		clusterCentres:
+		data:
+		iteration:
+
+	Returns:
+
 	"""
 	
 	for index, clusterCentre in enumerate(clusterCentres):
@@ -59,6 +66,13 @@ def plot_clusters(clusterCentres, data, iteration):
 
 def update_cluster_centres(clusterCentres, data):
 	"""
+
+	Args:
+		clusterCentres:
+		data:
+
+	Returns:
+
 	"""
 
 	# list of lists. the inner lists will contain the datapoints
@@ -77,21 +91,36 @@ def update_cluster_centres(clusterCentres, data):
 	return new_centres
 
 def get_closest_cluster(dataPoint, clusterCentres):
+	"""
 
-		distances = []
+	Args:
+		dataPoint:
+		clusterCentres:
 
-		for clusterCentre in clusterCentres:
+	Returns:
 
-			dist = distance.euclidean(dataPoint, clusterCentre)
-			distances.append(dist)
+	"""
+	distances = []
 
-		closestCentreIndex = np.argmin(distances)
+	for clusterCentre in clusterCentres:
 
-		return closestCentreIndex
+		dist = distance.euclidean(dataPoint, clusterCentre)
+		distances.append(dist)
+
+	closestCentreIndex = np.argmin(distances)
+
+	return closestCentreIndex
 		
 
 def find_averages(clusterData, clusterCentres):
 	"""
+
+	Args:
+		clusterData:
+		clusterCentres:
+
+	Returns:
+
 	"""
 
 	clusterSumsX = [0] * len(clusterCentres)
@@ -118,6 +147,16 @@ def find_averages(clusterData, clusterCentres):
 
 def initiate_cluster_centres(numClusters, minX, maxX, minY, maxY):
 	"""
+
+	Args:
+		numClusters:
+		minX:
+		maxX:
+		minY:
+		maxY:
+
+	Returns:
+
 	"""
 
 	clusterCentres = []
@@ -133,6 +172,12 @@ def initiate_cluster_centres(numClusters, minX, maxX, minY, maxY):
 
 def get_min_max(data):
 	"""
+
+	Args:
+		data:
+
+	Returns:
+
 	"""
 
 
@@ -145,12 +190,15 @@ def get_min_max(data):
 
 def main():
 	"""
+
+	Returns:
+
 	"""
 	data = np.genfromtxt('iris.csv', delimiter = ',')
 
 	#petal length and petal width
 	xyData = data[1:,2:4]
-	print(xyData)
+	#print(xyData)
 	
 
 	k_means_cluster(xyData, 3, 10)
